@@ -35,8 +35,11 @@ def main():
         ##### now add code for DogAPI here (inside this block of code!) thx
         ####
         ####
+        #####
+
+    
     else:
-        print("Not logged in.")
+        print("Not logged in. Sorry no dog pics until you log in!")
 
 if __name__ == "__main__":
     main()
