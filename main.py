@@ -30,12 +30,17 @@ def main():
 
     if user:
         print("User is logged in.")
-        store_user_data(user)
 
         ##### now add code for DogAPI here (inside this block of code!) thx
         ####
         ####
         #####
+        import requests
+        url= 'https://api.thedogapi.com/v1/images/search'
+        headers= {'x-api-key':'live_lYvNHFVb44Md9LN8D7kNtzPWtOdZrfhqrLG15u3gdZwgG0JOOb3V7ZNK6srMwZnS'}
+        response= requests.get (url, headers)
+        data=response.json()
+        print (data)
 
     
     else:
