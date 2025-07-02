@@ -1,5 +1,6 @@
 import sqlite3
 import requests
+import random
 
 
 
@@ -15,6 +16,7 @@ def setup_db():
     ''')
     conn.commit()
     conn.close()
+
 
 
 def create_account():
@@ -76,6 +78,53 @@ def loggedIn():
         print("Failed to fetch dog image.")
 
 
+
+CLIENT_ID = "BK09a99NhuhirWVIbgR3Svy20vdWyKEvsMRW237GtqatDkUvPe"
+CLIENT_SECRET = "IRpnquDucc1o8dkaJwZzVvQYcixJ6OY9S2O9JtWV"
+
+def get_access_token():
+    url = "https://api.petfinder.com/v2/oauth2/token"
+    data = {
+        "grant_type": "client_credentials",
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET
+    }
+    response = requests.post(url, data=data)
+    response.raise_for_status()
+    return response.json()["access_token"]
+
+
+def find_local_dog(location="10001", distance=50):
+    token = get_access_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    params = {
+        "type": "dog",
+        "location": location,
+        "distance": distance,
+        "limit": 10,
+        "sort": "random"
+    }
+
+    url = "https://api.petfinder.com/v2/animals"
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
+    dogs = response.json().get("animals", [])
+
+    if not dogs:
+        print("No dogs found nearby.")
+        return
+
+    dog = random.choice(dogs)  # pick one random dog
+    name = dog.get("name", "Unknown")
+    desc = dog.get("description", "No description available.")
+    link = dog.get("url", "No link provided.")
+
+    print(f"\nWe found you a dog in your area! Meet {name}!\n")
+    print(f"---{desc}\n")
+    print(f"---Learn more: {link}")
+
+
+
 def main():
     setup_db()
 
@@ -86,6 +135,8 @@ def main():
 
     if choice == "1":
         login()
+        zipCode = input("Enter your zip code to find dogs in your area!: ")
+        find_local_dog(zipCode)
     elif choice == "2":
         create_account()
     else:
