@@ -1,6 +1,9 @@
 import sqlite3
 import requests
 import random
+import os 
+from google import genai
+from google.genai import types
 
 
 
@@ -78,7 +81,7 @@ def loggedIn():
         print("Failed to fetch dog image.")
 
 
-
+#pet finder
 CLIENT_ID = "BK09a99NhuhirWVIbgR3Svy20vdWyKEvsMRW237GtqatDkUvPe"
 CLIENT_SECRET = "IRpnquDucc1o8dkaJwZzVvQYcixJ6OY9S2O9JtWV"
 
@@ -91,37 +94,84 @@ def get_access_token():
     }
     response = requests.post(url, data=data)
     response.raise_for_status()
-    return response.json()["access_token"]
+    token = response.json().get("access_token")
+    #print("Access token received:", token)
+    return token
 
 
-def find_local_dog(location="10001", distance=50):
+
+def find_local_dog(color=None):
     token = get_access_token()
     headers = {"Authorization": f"Bearer {token}"}
     params = {
         "type": "dog",
-        "location": location,
-        "distance": distance,
-        "limit": 10,
+        "limit": 1,
         "sort": "random"
     }
+    if color:
+        params["color"] = color  # Make sure this matches Petfinder colors exactly
 
     url = "https://api.petfinder.com/v2/animals"
     response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()
-    dogs = response.json().get("animals", [])
 
-    if not dogs:
-        print("No dogs found nearby.")
+    if response.status_code == 401:
+        print("Unauthorized: Token invalid or expired")
         return
 
-    dog = random.choice(dogs)  # pick one random dog
+    response.raise_for_status()
+
+    data = response.json()
+    dogs = data.get("animals", [])
+
+    if not dogs:
+        print(f"No dogs found matching your criteria: color={color}")
+        return
+
+    dog = dogs[0]
     name = dog.get("name", "Unknown")
     desc = dog.get("description", "No description available.")
     link = dog.get("url", "No link provided.")
 
-    print(f"\nWe found you a dog in your area! Meet {name}!\n")
+    print(f"\nWe found you a {color or ''} dog! Meet {name}!\n")
     print(f"---{desc}\n")
     print(f"---Learn more: {link}")
+
+
+
+my_api_key = 'AIzaSyCciB6bFHQnxXucRCfBBc-kt2NLsHy5pLQ'
+genai.api_key = my_api_key
+
+def getmood():
+    usermood= input("Enter your mood. An AI will find a dog for you based on your mood: ")
+    client = genai.Client( api_key=my_api_key,)
+
+    response= client.models.generate_content( 
+
+    model="gemini-2.5-flash",
+    config=types.GenerateContentConfig(
+    system_instruction= "You are a helpful assistant that recommends dog colors"
+    "based on the user's emotional state. Pick from black, sable, golden"
+    "Give only one sentence explaining why the color is suitable."),  
+    
+    contents="I am currently feeling \"" + usermood + "\". Recommend a dog breed.")
+
+
+    response_text = response.text.strip()
+    print("AI response:", response_text)
+
+    petfinder_colors = ["Black", "Sable", "Golden"]
+    recommended_color = None
+    for color in petfinder_colors:
+        if color.lower() in response_text.lower():
+            recommended_color = color  # Use the exact casing here
+            break
+
+
+    if recommended_color:
+        print(f"Recommended dog color based on mood: {recommended_color}")
+        return recommended_color
+    else:
+        print("Could not find a recommended color in the response.")
 
 
 
@@ -135,8 +185,9 @@ def main():
 
     if choice == "1":
         login()
-        zipCode = input("Enter your zip code to find dogs in your area!: ")
-        find_local_dog(zipCode)
+        # call genAI to return color
+        color = getmood()
+        find_local_dog(color)
     elif choice == "2":
         create_account()
     else:
@@ -146,30 +197,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-import os 
-from google import genai
-from google.genai import types
-my_api_key = 'AIzaSyCciB6bFHQnxXucRCfBBc-kt2NLsHy5pLQ'
-
-genai.api_key = my_api_key
-
-def getmood():
-    usermood= input("State your current mood in one word")
-    client = genai.Client( api_key=my_api_key,)
-
-    response= client.models.generate_content( 
-
-    model="gemini-2.5-flash",
-    config=types.GenerateContentConfig(
-    system_instruction= "You are a helpful assistant that recommends dog breeds"
-    "based on the user's emotional state."
-    "Give only one sentence explaining why the breed is suitable."),  
-    
-    contents="I am currently feeling \"" + usermood + "\". Recommend a dog breed.")
-
-    print(response.text)
-    
-
-    getmood()
 
 
