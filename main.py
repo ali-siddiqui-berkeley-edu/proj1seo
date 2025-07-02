@@ -80,6 +80,9 @@ def loggedIn():
     else:
         print("Failed to fetch dog image.")
 
+    color = getmood()
+    find_local_dog(color)
+
 
 #pet finder
 CLIENT_ID = "BK09a99NhuhirWVIbgR3Svy20vdWyKEvsMRW237GtqatDkUvPe"
@@ -186,8 +189,7 @@ def main():
     if choice == "1":
         login()
         # call genAI to return color
-        color = getmood()
-        find_local_dog(color)
+    
     elif choice == "2":
         create_account()
     else:
@@ -196,6 +198,12 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
 
 
 
