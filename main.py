@@ -146,6 +146,30 @@ def main():
 if __name__ == "__main__":
     main()
 
+import os 
+from google import genai
+from google.genai import types
+my_api_key = 'AIzaSyCciB6bFHQnxXucRCfBBc-kt2NLsHy5pLQ'
 
+genai.api_key = my_api_key
+
+def getmood():
+    usermood= input("State your current mood in one word")
+    client = genai.Client( api_key=my_api_key,)
+
+    response= client.models.generate_content( 
+
+    model="gemini-2.5-flash",
+    config=types.GenerateContentConfig(
+    system_instruction= "You are a helpful assistant that recommends dog breeds"
+    "based on the user's emotional state."
+    "Give only one sentence explaining why the breed is suitable."),  
+    
+    contents="I am currently feeling \"" + usermood + "\". Recommend a dog breed.")
+
+    print(response.text)
+    
+
+    getmood()
 
 
