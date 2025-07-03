@@ -1,4 +1,4 @@
-#Table of Contents:
+#Table of Contents: /n
 *Login Instructions
 *About PawPal :sparkles:
 
