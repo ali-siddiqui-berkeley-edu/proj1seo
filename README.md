@@ -9,9 +9,9 @@
 
 #About PawPal
 **Pawpal harnesses the power (cuteness) of dogs to lift anyone's mood**
-*The program will use Gemmini AI to suggest a dog by color based on the user's mood. *
-*A photo of a dog matching Gemini AI's description will be provided using the DogAPI *
-*The program will also show nearby Pet adoption agencies based on theur zipcode using the PetFinderAPI *
+*The program will use Gemmini AI to suggest a dog by color based on the user's mood. 
+*A photo of a dog matching Gemini AI's description will be provided using the DogAPI 
+*The program will also show nearby Pet adoption agencies based on theur zipcode using the PetFinderAPI 
 
 
 
